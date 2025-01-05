@@ -14,12 +14,13 @@ This tool decodes a Base64-encoded string, detects its character encoding, and c
 
 ### Command-line Usage
 ```bash
-base64-detector <base64_string>
+check64.exe <possible base64 string>
+בי <base64_string>
 ```
 
 ### Example
 ```bash
-base64-detector Y2QgLi4=
+check64.exe Y2QgLi4=
 ```
 
 Output:
