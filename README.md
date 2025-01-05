@@ -41,13 +41,13 @@ Detected script commands: ["cd"]
 Download the latest release binary from the [Releases](https://github.com/yourusername/yourrepository/releases/latest) page.
 
 1. Navigate to the [Latest Release](https://github.com/yourusername/yourrepository/releases/latest).
-2. Download the binary for your platform (`check64` for Linux or `check64.exe` for Windows).
+2. Download the binary for your platform
 
 ### Build from Source
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/yourrepository.git
-   cd yourrepository
+   git clone https://github.com/catsec/check64
+   cd check64
    ```
 2. Build the binary:
    ```bash
