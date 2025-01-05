@@ -41,36 +41,38 @@ fn contains_script_commands(text: &str) -> Vec<String> {
         "ForEach-Object", "Where-Object", "Switch", "If", "Else", "For", "While", "Do", "Try",
         "Catch", "Finally", "Throw",
     ];
-    let bash_commands = [
-        "ls ", "cd ", "pwd", "cp ", "mv ", "rm ", "mkdir", "rmdir", "touch", "cat", "more", "less",
-        "head", "tail", "find", "grep", "sed ", "awk", "echo", "chmod", "chown", "ps ", "top", "htop",
-        "kill", "killall", "df ", "du ", "tar", "zip", "unzip", "scp", "rsync", "wget", "curl", "apt",
-        "yum", "dnf", "pacman", "zypper", "make", "gcc", "g++", "nano", "vim", "vi ", "emacs", "ssh ",
-        "ping", "traceroute", "whoami", "id ", "su ", "sudo ", "passwd", "env ", "export", "alias",
-        "unalias", "history", "uptime", "free", "mount", "umount", "ifconfig", "ip ", "netstat", "ss ",
-        "iptables", "systemctl", "service", "journalctl", "dmesg", "uname", "hostname", "date",
-        "time", "who", "users", "info", "which", "whereis", "locate", "updatedb", "stat",
-        "tee ", "sort", "uniq", "wc ", "cut ", "xargs", "basename", "dirname", "sleep", "bc ", "expr",
+    let bash_commands_with_args = [
+        "cd", "cp", "mv", "rm", "mkdir", "rmdir", "scp", "rsync", "chmod", "chown", "wget", "curl",
+        "find", "grep", "sed", "awk", "export", "alias", "unalias", "env", "ip", "iptables",
+    ];
+    let bash_commands_no_args = [
+        "ls", "pwd", "cat", "more", "less", "head", "tail", "ps", "top", "htop", "df", "du", "tar",
+        "zip", "unzip", "nano", "vim", "vi", "ssh", "ping", "traceroute", "whoami", "uname", "date",
+        "time", "who", "users", "info", "which", "whereis", "updatedb", "stat", "uptime", "free",
     ];
     let windows_commands = [
-        "dir", "cls", "copy", "del", "move", "type", "rename", "rmdir", "mkdir", "attrib", "net ",
-        "netstat", "ping", "tracert", "ipconfig", "tasklist", "taskkill", "systeminfo", "whoami",
-        "reg", "regedit", "schtasks", "shutdown", "sc ", "diskpart", "format", "chkdsk", "sfc",
-        "fc ", "find", "findstr", "set ", "setx", "echo", "pause", "color", "title", "cls", "tree",
-        "call", "start", "assoc", "ftype", "mode", "date", "time", "path", "prompt", "exit", "help",
-        "ver", "typeperf", "fsutil", "diskshadow", "compact", "cipher", "diskcopy", "powercfg",
-        "xcopy", "robocopy", "expand", "clip", "print", "start", "shutdown", "wmic", "nc ",
+        "dir", "cls", "copy", "del", "move", "type", "rename", "attrib", "net", "netstat", "ping",
+        "tracert", "ipconfig", "tasklist", "taskkill", "systeminfo", "whoami", "reg", "schtasks",
+        "shutdown", "sc", "diskpart", "format", "chkdsk", "sfc", "find", "findstr", "set", "setx",
+        "echo", "pause", "color", "title", "tree", "call", "start", "ver", "wmic",
     ];
-    let script_commands: Vec<&str> = powershell_commands
-        .iter()
-        .chain(bash_commands.iter())
-        .chain(windows_commands.iter())
-        .copied()
-        .collect();
-    let pattern = format!(r"(?i)\b({})\b", script_commands.join("|"));
-    let re = Regex::new(&pattern).unwrap();
-    re.find_iter(text).map(|mat| mat.as_str().to_string()).collect()
+
+    let pattern_with_args = format!(r"(?i)\b({})(\s+|$)", bash_commands_with_args.join("|"));
+    let pattern_no_args = format!(r"(?i)\b({})\b", bash_commands_no_args.join("|"));
+    let powershell_pattern = format!(r"(?i)\b({})\b", powershell_commands.join("|"));
+    let windows_pattern = format!(r"(?i)\b({})\b", windows_commands.join("|"));
+    let combined_pattern = format!(
+        "{}|{}|{}|{}",
+        pattern_with_args, pattern_no_args, powershell_pattern, windows_pattern
+    );
+    let re = Regex::new(&combined_pattern).unwrap();
+    re.captures_iter(text)
+        .filter_map(|caps| caps.get(1)) 
+        .map(|m| m.as_str().to_string())
+        .collect()
 }
+
+
   
 fn decode_with_encoding(bytes: &[u8], encoding: &str) -> Option<String> {
     match encoding {
@@ -116,7 +118,6 @@ fn main() {
     let normal_assurance_percentage = (detected_normal.1 * 100.0).round();
 
     let xored_bytes: Vec<u8> = decoded_bytes.iter().map(|b| b ^ 0xFF).collect();
-
     let detected_xored = detect(&xored_bytes);
     let xored_encoding = charset2encoding(&detected_xored.0);
     let xored_assurance_percentage = (detected_xored.1 * 100.0).round();
