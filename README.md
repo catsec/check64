@@ -14,8 +14,7 @@ This tool decodes a Base64-encoded string, detects its character encoding, and c
 
 ### Command-line Usage
 ```bash
-check64.exe <possible base64 string>
-בי <base64_string>
+check64.exe <base64_string>
 ```
 
 ### Example
