@@ -103,6 +103,7 @@ fn main() {
         println!("not base64");
         std::process::exit(0);
     }
+
     let decoded_bytes = match general_purpose::STANDARD.decode(&padded_input) {
         Ok(bytes) => bytes,
         Err(_) => {
@@ -110,27 +111,41 @@ fn main() {
             std::process::exit(0);
         }
     };
-    let detected = detect(&decoded_bytes);
-    let encoding = charset2encoding(&detected.0);
-    let assurance_percentage = (detected.1 * 100.0).round(); // Convert to percentage
-    if let Some(decoded_text) = decode_with_encoding(&decoded_bytes, encoding) {
-        let detected_commands = contains_script_commands(&decoded_text);
+    let detected_normal = detect(&decoded_bytes);
+    let normal_encoding = charset2encoding(&detected_normal.0);
+    let normal_assurance_percentage = (detected_normal.1 * 100.0).round();
 
+    let xored_bytes: Vec<u8> = decoded_bytes.iter().map(|b| b ^ 0xFF).collect();
+
+    let detected_xored = detect(&xored_bytes);
+    let xored_encoding = charset2encoding(&detected_xored.0);
+    let xored_assurance_percentage = (detected_xored.1 * 100.0).round();
+
+    let (final_bytes, final_encoding, final_assurance, was_xored) = if normal_assurance_percentage >= xored_assurance_percentage {
+        (&decoded_bytes, normal_encoding, normal_assurance_percentage, false)
+    } else {
+        (&xored_bytes, xored_encoding, xored_assurance_percentage, true)
+    };
+
+    if let Some(decoded_text) = decode_with_encoding(final_bytes, final_encoding) {
+        let detected_commands = contains_script_commands(&decoded_text);
         if !detected_commands.is_empty() {
             println!("error: script commands found");
-            println!("Detected encoding: {}", encoding);
-            println!("Assurance: {}%", assurance_percentage);
+            println!("Was XORed: {}", was_xored);
+            println!("Detected encoding: {}", final_encoding);
+            println!("Assurance: {}%", final_assurance);
             println!("Detected script commands: {:?}", detected_commands);
             std::process::exit(1);
         }
-
         println!("no script commands found");
-        println!("Detected encoding: {}", encoding);
-        println!("Assurance: {}%", assurance_percentage);
+        println!("Was XORed: {}", was_xored);
+        println!("Detected encoding: {}", final_encoding);
+        println!("Assurance: {}%", final_assurance);
     } else {
         println!("error: unsupported encoding");
-        println!("Detected encoding: {}", encoding);
-        println!("Assurance: {}%", assurance_percentage);
+        println!("Was XORed: {}", was_xored);
+        println!("Detected encoding: {}", final_encoding);
+        println!("Assurance: {}%", final_assurance);
         std::process::exit(1);
     }
 }
