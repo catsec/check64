@@ -41,7 +41,6 @@ fn contains_script_commands(text: &str) -> Vec<String> {
         "ForEach-Object", "Where-Object", "Switch", "If", "Else", "For", "While", "Do", "Try",
         "Catch", "Finally", "Throw",
     ];
-
     let bash_commands = [
         "ls", "cd", "pwd", "cp", "mv", "rm", "mkdir", "rmdir", "touch", "cat", "more", "less",
         "head", "tail", "find", "grep", "sed", "awk", "echo", "chmod", "chown", "ps", "top", "htop",
@@ -53,7 +52,6 @@ fn contains_script_commands(text: &str) -> Vec<String> {
         "time", "who", "w", "users", "man", "info", "which", "whereis", "locate", "updatedb", "stat",
         "tee", "sort", "uniq", "wc", "cut", "xargs", "basename", "dirname", "sleep", "bc", "expr",
     ];
-
     let windows_commands = [
         "dir", "cls", "copy", "del", "move", "type", "rename", "rmdir", "mkdir", "attrib", "net",
         "netstat", "ping", "tracert", "ipconfig", "tasklist", "taskkill", "systeminfo", "whoami",
@@ -86,14 +84,12 @@ fn decode_with_encoding(bytes: &[u8], encoding: &str) -> Option<String> {
             String::from_utf16(&utf16).ok()
         }
         _ => {
-            // Try other encodings using `encoding_rs`
             let encoding = Encoding::for_label(encoding.as_bytes()).unwrap_or(UTF_8);
             let (decoded, _, _) = encoding.decode(bytes);
             decoded.into_owned().into()
         }
     }
 }
-
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
@@ -107,7 +103,6 @@ fn main() {
         println!("not base64");
         std::process::exit(0);
     }
-
     let decoded_bytes = match general_purpose::STANDARD.decode(&padded_input) {
         Ok(bytes) => bytes,
         Err(_) => {
@@ -115,13 +110,9 @@ fn main() {
             std::process::exit(0);
         }
     };
-
-    // Detect encoding
     let detected = detect(&decoded_bytes);
     let encoding = charset2encoding(&detected.0);
     let assurance_percentage = (detected.1 * 100.0).round(); // Convert to percentage
-
-    // Decode using detected encoding
     if let Some(decoded_text) = decode_with_encoding(&decoded_bytes, encoding) {
         let detected_commands = contains_script_commands(&decoded_text);
 
