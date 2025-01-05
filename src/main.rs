@@ -42,24 +42,24 @@ fn contains_script_commands(text: &str) -> Vec<String> {
         "Catch", "Finally", "Throw",
     ];
     let bash_commands = [
-        "ls", "cd", "pwd", "cp", "mv", "rm", "mkdir", "rmdir", "touch", "cat", "more", "less",
-        "head", "tail", "find", "grep", "sed", "awk", "echo", "chmod", "chown", "ps", "top", "htop",
-        "kill", "killall", "df", "du", "tar", "zip", "unzip", "scp", "rsync", "wget", "curl", "apt",
+        "ls ", "cd ", "pwd", "cp ", "mv ", "rm ", "mkdir", "rmdir", "touch", "cat", "more", "less",
+        "head", "tail", "find", "grep", "sed ", "awk", "echo", "chmod", "chown", "ps ", "top", "htop",
+        "kill", "killall", "df ", "du ", "tar", "zip", "unzip", "scp", "rsync", "wget", "curl", "apt",
         "yum", "dnf", "pacman", "zypper", "make", "gcc", "g++", "nano", "vim", "vi", "emacs", "ssh",
-        "ping", "traceroute", "whoami", "id", "su", "sudo", "passwd", "env", "export", "alias",
-        "unalias", "history", "uptime", "free", "mount", "umount", "ifconfig", "ip", "netstat", "ss",
+        "ping", "traceroute", "whoami", "id ", "su ", "sudo ", "passwd", "env ", "export", "alias",
+        "unalias", "history", "uptime", "free", "mount", "umount", "ifconfig", "ip ", "netstat", "ss ",
         "iptables", "systemctl", "service", "journalctl", "dmesg", "uname", "hostname", "date",
-        "time", "who", "w", "users", "man", "info", "which", "whereis", "locate", "updatedb", "stat",
-        "tee", "sort", "uniq", "wc", "cut", "xargs", "basename", "dirname", "sleep", "bc", "expr",
+        "time", "who", "users", "info", "which", "whereis", "locate", "updatedb", "stat",
+        "tee ", "sort", "uniq", "wc ", "cut ", "xargs", "basename", "dirname", "sleep", "bc ", "expr",
     ];
     let windows_commands = [
-        "dir", "cls", "copy", "del", "move", "type", "rename", "rmdir", "mkdir", "attrib", "net",
+        "dir", "cls", "copy", "del", "move", "type", "rename", "rmdir", "mkdir", "attrib", "net ",
         "netstat", "ping", "tracert", "ipconfig", "tasklist", "taskkill", "systeminfo", "whoami",
-        "reg", "regedit", "schtasks", "shutdown", "sc", "diskpart", "format", "chkdsk", "sfc",
-        "fc", "find", "findstr", "set", "setx", "echo", "pause", "color", "title", "cls", "tree",
+        "reg", "regedit", "schtasks", "shutdown", "sc ", "diskpart", "format", "chkdsk", "sfc",
+        "fc ", "find", "findstr", "set ", "setx", "echo", "pause", "color", "title", "cls", "tree",
         "call", "start", "assoc", "ftype", "mode", "date", "time", "path", "prompt", "exit", "help",
         "ver", "typeperf", "fsutil", "diskshadow", "compact", "cipher", "diskcopy", "powercfg",
-        "xcopy", "robocopy", "expand", "clip", "print", "start", "shutdown", "wmic", "nc",
+        "xcopy", "robocopy", "expand", "clip", "print", "start", "shutdown", "wmic", "nc ",
     ];
     let script_commands: Vec<&str> = powershell_commands
         .iter()
@@ -67,7 +67,7 @@ fn contains_script_commands(text: &str) -> Vec<String> {
         .chain(windows_commands.iter())
         .copied()
         .collect();
-    let pattern = format!(r"\b({})\b", script_commands.join("|"));
+    let pattern = format!(r"(?i)\b({})\b", script_commands.join("|"));
     let re = Regex::new(&pattern).unwrap();
     re.find_iter(text).map(|mat| mat.as_str().to_string()).collect()
 }
