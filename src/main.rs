@@ -20,7 +20,6 @@ fn is_base64(input: &str) -> bool {
     let base64_pattern = Regex::new(r"^[A-Za-z0-9+/]+={0,2}$").unwrap();
     base64_pattern.is_match(input)
 }
-
 fn contains_script_commands(text: &str) -> Vec<String> {
     let powershell_commands = [
         "Get-Command", "Get-Help", "Get-Service", "Start-Service", "Stop-Service", "Restart-Service",
@@ -65,15 +64,15 @@ fn contains_script_commands(text: &str) -> Vec<String> {
         "{}|{}|{}|{}",
         pattern_with_args, pattern_no_args, powershell_pattern, windows_pattern
     );
+
     let re = Regex::new(&combined_pattern).unwrap();
-    re.captures_iter(text)
-        .filter_map(|caps| caps.get(1)) 
-        .map(|m| m.as_str().to_string())
-        .collect()
+    let mut detected_commands = Vec::new();
+    for mat in re.find_iter(text) {
+        detected_commands.push(mat.as_str().trim().to_string());
+    } 
+    detected_commands
 }
 
-
-  
 fn decode_with_encoding(bytes: &[u8], encoding: &str) -> Option<String> {
     match encoding {
         "UTF-8" => String::from_utf8(bytes.to_vec()).ok(),
