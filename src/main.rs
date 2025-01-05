@@ -45,7 +45,7 @@ fn contains_script_commands(text: &str) -> Vec<String> {
         "ls ", "cd ", "pwd", "cp ", "mv ", "rm ", "mkdir", "rmdir", "touch", "cat", "more", "less",
         "head", "tail", "find", "grep", "sed ", "awk", "echo", "chmod", "chown", "ps ", "top", "htop",
         "kill", "killall", "df ", "du ", "tar", "zip", "unzip", "scp", "rsync", "wget", "curl", "apt",
-        "yum", "dnf", "pacman", "zypper", "make", "gcc", "g++", "nano", "vim", "vi", "emacs", "ssh",
+        "yum", "dnf", "pacman", "zypper", "make", "gcc", "g++", "nano", "vim", "vi ", "emacs", "ssh ",
         "ping", "traceroute", "whoami", "id ", "su ", "sudo ", "passwd", "env ", "export", "alias",
         "unalias", "history", "uptime", "free", "mount", "umount", "ifconfig", "ip ", "netstat", "ss ",
         "iptables", "systemctl", "service", "journalctl", "dmesg", "uname", "hostname", "date",
